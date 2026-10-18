@@ -1,0 +1,10 @@
+build*/
+node_modules/
+resources/parts/*.png
+src/generated_parts.cpp
+original_parts_manifest.json
+*.geode
+*.android32.so
+*.android64.so
+*.dll
+*.dylib
