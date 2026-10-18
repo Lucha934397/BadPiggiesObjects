@@ -1,0 +1,42 @@
+{
+  "geode": "v5.9.0",
+  "gd": {
+    "android": "2.2081"
+  },
+  "id": "fusimate.badpiggies-objects",
+  "name": "Bad Piggies Objects",
+  "version": "v1.3.0",
+  "developer": "Fusimate Community",
+  "description": "Original Bad Piggies sprite objects for the Geometry Dash editor, powered by Object-Collab.",
+  "early-load": true,
+  "dependencies": {
+    "smjs.object-collab": {
+      "version": ">=v0.6.3",
+      "required": true
+    }
+  },
+  "resources": {
+    "spritesheets": {
+      "BadPiggiesObjects": [
+        "resources/parts/*.png"
+      ]
+    }
+  },
+  "tags": [
+    "editor",
+    "content",
+    "offline"
+  ],
+  "settings": {
+    "original-parts-title": {
+      "type": "title",
+      "name": "Bad Piggies objects"
+    },
+    "show-original-parts": {
+      "type": "bool",
+      "name": "Register original parts",
+      "description": "Registers unchanged crops from the original Bad Piggies Custom Parts atlas. Restart Geometry Dash after changing this setting.",
+      "default": true
+    }
+  }
+}
