@@ -1,0 +1,10 @@
+{
+  "name": "badpiggies-objects-geode-build",
+  "private": true,
+  "version": "1.3.0",
+  "type": "module",
+  "description": "Build-time extraction of original Bad Piggies object sprites for a Geode mod",
+  "devDependencies": {
+    "sharp": "^0.34.3"
+  }
+}
