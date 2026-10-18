@@ -164,7 +164,7 @@ function generatedSource(parts) {
       '            .defaultZLayer(ZLayer::Default)',
       '            .defaultZOrder(2)',
       '            .build())',
-      '        .editorTab(EditorTab::Solids)',
+      '        .editorTab(EditorTab::Decorations)',
       '        .build());'
     );
   }
