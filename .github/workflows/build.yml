@@ -31,7 +31,7 @@ jobs:
           target: Android64
           combine: false
           ccache-variant: ""
-          configure-args: '-DCMAKE_CXX_COMPILER_LAUNCHER=bash;${{ github.workspace }}/tools/patch-compiler-launcher.sh'
+          configure-args: -DCMAKE_CXX_COMPILER_LAUNCHER=bash\;$GITHUB_WORKSPACE/tools/patch-compiler-launcher.sh
 
       - name: Verify packaged native library is AArch64
         shell: bash
