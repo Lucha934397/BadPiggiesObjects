@@ -6,7 +6,7 @@ set -euo pipefail
 compiler="$1"
 shift
 
-python3 - "\${GITHUB_WORKSPACE:-$PWD}/build/bindings/bindings/Geode/binding/SequenceTriggerGameObject.hpp" <<'PY'
+python3 - "${GITHUB_WORKSPACE:-$PWD}/build/bindings/bindings/Geode/binding/SequenceTriggerGameObject.hpp" <<'PY'
 from pathlib import Path
 import re
 import sys
