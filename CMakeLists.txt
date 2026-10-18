@@ -31,21 +31,23 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 setup_geode_mod(${PROJECT_NAME})
 
-# Geode 5.9.0's generated 2.2081 bindings forward-declare SequenceTriggerState
-# but store it by value in SequenceTriggerGameObject. Include its full generated
-# definition before that field is parsed. Only patches the generated build tree.
+# Android64 compatibility fix for the generated GD 2.2081 bindings. On Android
+# the generated SequenceTriggerState header is only a forward declaration, but
+# SequenceTriggerGameObject stores the type by value. Define the exact two
+# fields declared in bindings/2.2081/Extras.bro before that class is parsed.
 set(SEQ_TRIGGER_HEADER "${CMAKE_BINARY_DIR}/bindings/bindings/Geode/binding/SequenceTriggerGameObject.hpp")
 if (EXISTS "${SEQ_TRIGGER_HEADER}")
     file(READ "${SEQ_TRIGGER_HEADER}" SEQ_TRIGGER_TEXT)
-    string(FIND "${SEQ_TRIGGER_TEXT}" "#include <Geode/binding/SequenceTriggerState.hpp>" SEQ_STATE_INCLUDE_POS)
-    if (SEQ_STATE_INCLUDE_POS EQUAL -1)
-        string(FIND "${SEQ_TRIGGER_TEXT}" "#pragma once" SEQ_PRAGMA_POS)
-        if (SEQ_PRAGMA_POS EQUAL -1)
-            message(FATAL_ERROR "Cannot safely patch generated SequenceTriggerGameObject.hpp: #pragma once not found.")
+    string(FIND "${SEQ_TRIGGER_TEXT}" "GEODE_ANDROID_SEQUENCE_TRIGGER_STATE_FIXED" SEQ_STATE_FIXED_POS)
+    if (SEQ_STATE_FIXED_POS EQUAL -1)
+        string(FIND "${SEQ_TRIGGER_TEXT}" "class SequenceTriggerGameObject" SEQ_CLASS_POS)
+        if (SEQ_CLASS_POS EQUAL -1)
+            message(FATAL_ERROR "Cannot patch generated SequenceTriggerGameObject.hpp: class declaration not found.")
         endif()
-        string(REPLACE "#pragma once" "#pragma once\n#include <Geode/binding/SequenceTriggerState.hpp>" SEQ_TRIGGER_PATCHED "${SEQ_TRIGGER_TEXT}")
+        set(SEQ_STATE_SHIM "#if defined(GEODE_IS_ANDROID)\n#ifndef GEODE_ANDROID_SEQUENCE_TRIGGER_STATE_FIXED\n#define GEODE_ANDROID_SEQUENCE_TRIGGER_STATE_FIXED\nclass SequenceTriggerState {\npublic:\n    gd::unordered_map<int, float> m_sequenceTimes;\n    gd::unordered_map<int, int> m_sequenceIndices;\n};\n#endif\n#endif\n\n")
+        string(REPLACE "class SequenceTriggerGameObject" "${SEQ_STATE_SHIM}class SequenceTriggerGameObject" SEQ_TRIGGER_PATCHED "${SEQ_TRIGGER_TEXT}")
         file(WRITE "${SEQ_TRIGGER_HEADER}" "${SEQ_TRIGGER_PATCHED}")
-        message(STATUS "Patched generated Geode binding: included complete SequenceTriggerState definition.")
+        message(STATUS "Patched Android64 GD 2.2081 SequenceTriggerState layout from Extras.bro.")
     endif()
 else()
     message(FATAL_ERROR "Expected generated binding not found: ${SEQ_TRIGGER_HEADER}")
