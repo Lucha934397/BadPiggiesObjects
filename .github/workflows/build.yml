@@ -1,0 +1,74 @@
+name: Build Bad Piggies Objects (Android64)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-android64:
+    name: Build and verify Android64 Geode package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install sprite extraction dependency
+        run: npm install --no-audit --no-fund
+
+      - name: Build Geode mod for Android64
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: given
+          target: Android64
+          combine: false
+
+      - name: Verify packaged native library is AArch64
+        shell: bash
+        env:
+          MOD_DIR: ${{ steps.build.outputs.build-output }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y
+          sudo apt-get install -y binutils unzip
+          shopt -s nullglob
+          packages=("$MOD_DIR"/*.geode)
+          if [ ${#packages[@]} -eq 0 ]; then
+            echo "Build produced no .geode file" >&2
+            exit 1
+          fi
+          verified=0
+          for mod in "${packages[@]}"; do
+            while IFS= read -r entry; do
+              case "$entry" in
+                *.android64.so)
+                  tmp="$(mktemp)"
+                  unzip -p "$mod" "$entry" > "$tmp"
+                  readelf -h "$tmp" > "$tmp.elf"
+                  grep -q 'Class:.*ELF64' "$tmp.elf"
+                  grep -Eq 'Machine:.*AArch64' "$tmp.elf"
+                  test "$(stat -c%s "$tmp")" -gt 4096
+                  rm -f "$tmp" "$tmp.elf"
+                  verified=1
+                  ;;
+              esac
+            done < <(unzip -Z1 "$mod")
+          done
+          [ "$verified" -eq 1 ] || { echo "No valid Android64 AArch64 library found inside .geode" >&2; exit 1; }
+          echo "Verified: a real Android64 ELF64/AArch64 native library is inside the Geode package."
+
+      - name: Upload installable Geode package
+        uses: actions/upload-artifact@v7
+        with:
+          name: BadPiggiesObjects-Android64-geode
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
+          retention-days: 30
