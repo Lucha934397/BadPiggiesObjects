@@ -30,11 +30,11 @@ public:
 
 if marker in text:
     pattern = re.compile(
-        r"#if defined\\(GEODE_IS_ANDROID\\)\\s*"
-        r"#ifndef GEODE_ANDROID_SEQUENCE_TRIGGER_STATE_FIXED\\s*"
-        r"#define GEODE_ANDROID_SEQUENCE_TRIGGER_STATE_FIXED\\s*"
-        r"class SequenceTriggerState\\s*\\{.*?\\n\\};\\s*"
-        r"#endif\\s*#endif\\s*",
+        r"#if defined\(GEODE_IS_ANDROID\)\s*"
+        r"#ifndef GEODE_ANDROID_SEQUENCE_TRIGGER_STATE_FIXED\s*"
+        r"#define GEODE_ANDROID_SEQUENCE_TRIGGER_STATE_FIXED\s*"
+        r"class SequenceTriggerState\s*\{.*?\n\};\s*"
+        r"#endif\s*#endif\s*",
         re.S,
     )
     replacement = re.sub(pattern, shim, text, count=1)
