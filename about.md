@@ -1,0 +1,1 @@
+Fan-made Geometry Dash editor objects made from unchanged sprite crops of the Bad Piggies Custom Parts atlas. Registration uses the public Object-Collab API. Bad Piggies assets remain the property of their respective rights holders. The atlas is fetched at build time; it is not redistributed in the source repository.
